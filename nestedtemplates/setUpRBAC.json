@@ -2,33 +2,107 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "principalId": {
-        "type": "string",
-        "metadata": {
-          "description": "Principal ID to set the access for"
+        "_artifactsLocation": {
+            "defaultValue": "https://raw.githubusercontent.com/ned1313/terraform-vm/master",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+            },
+            "type": "string"
+        },
+        "_artifactsLocationSasToken": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation."
+            },
+            "type": "securestring"
+        },
+        "principalId": {
+            "type": "string",
+            "metadata": {
+                "description": "Principal ID to set the access for"
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The storage account to set access for"
+            }
+        },
+        "installParm1": {
+            "type": "string"
+        },
+        "installParm2": {
+            "type": "string"
+        },
+        "installParm3": {
+            "type": "string"
+        },
+        "installParm4": {
+            "type": "string"
+        },
+        "installParm5": {
+            "type": "string"
+        },
+        "storageAccountKey": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
         }
-      },
-      "storageAccountName": {
-        "type": "string",
-        "metadata": {
-          "description": "The storage account to set access for"
-        }
-      }
     },
     "variables": {
-      "contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-      "RBACResourceName": "[concat(parameters('storageAccountName'),'/Microsoft.Authorization/',parameters('principalId'))]"
+        "contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "RBACResourceName": "[concat(parameters('storageAccountName'),'/Microsoft.Authorization/',parameters('principalId'))]"
     },
     "resources": [
-      {
-        "apiVersion": "2016-07-01",
-        "name": "[variables('RBACResourceName')]",
-        "type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
-        "properties": {
-          "roleDefinitionId": "[variables('contributor')]",
-          "principalId": "[parameters('principalId')]",
-          "scope": "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccountName'))]"
+        {
+            "apiVersion": "2016-07-01",
+            "name": "[variables('RBACResourceName')]",
+            "type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
+            "properties": {
+                "roleDefinitionId": "[variables('contributor')]",
+                "principalId": "[parameters('principalId')]",
+                "scope": "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccountName'))]"
+            }
+        },
+        {
+            "apiVersion": "2017-09-01",
+            "name": "[guid(resourceGroup().id)]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "properties": {
+                "roleDefinitionId": "[variables('contributor')]",
+                "principalId": "[parameters('principalId')]",
+                "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]"
+            }
+        },
+        {
+            "name": "[concat(parameters('vmName'),'/customscriptextension')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceGroup().id))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('_artifactsLocation'), '/scripts/infra.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), '/scripts/install.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), '/scripts/desktop.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('_artifactsLocationSasToken'))]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash infra.sh && bash install.sh ', parameters('installParm1'), parameters('installParm2'), parameters('installParm3'), parameters('installParm4'), parameters('installParm5'), ' -k ', parameters('storageAccountKey'), ' -l ', parameters('principalId'))]"
+                }
+            }
         }
-      }
     ]
-  }
+}
