@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "_artifactsLocation": {
-            "defaultValue": "https://raw.githubusercontent.com/ned1313/terraform-vm/master",
+            "defaultValue": "https://raw.githubusercontent.com/ned1313/terraform-vm/master/",
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
@@ -93,10 +93,10 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[concat(parameters('_artifactsLocation'), '/scripts/infra.sh', parameters('_artifactsLocationSasToken'))]",
-                        "[concat(parameters('_artifactsLocation'), '/scripts/install.sh', parameters('_artifactsLocationSasToken'))]",
-                        "[concat(parameters('_artifactsLocation'), '/scripts/desktop.sh', parameters('_artifactsLocationSasToken'))]",
-                        "[concat(parameters('_artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('_artifactsLocationSasToken'))]"
+                        "[concat(parameters('_artifactsLocation'), 'scripts/infra.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), 'scripts/install.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), 'scripts/desktop.sh', parameters('_artifactsLocationSasToken'))]",
+                        "[concat(parameters('_artifactsLocation'), 'scripts/azureProviderAndCreds.tf', parameters('_artifactsLocationSasToken'))]"
                     ]
                 },
                 "protectedSettings": {
