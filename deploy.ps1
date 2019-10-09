@@ -4,7 +4,7 @@ Add-AzAccount
 #Select the correct subscription
 Get-AzSubscription -SubscriptionName "PS" | Select-AzSubscription
 
-$ResourceGroupName = "tf-test1"
+$ResourceGroupName = "tf-test2"
 $Location = "eastus"
 
 $TemplateParameters = @{

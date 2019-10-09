@@ -95,7 +95,6 @@
                     "fileUris": [
                         "[concat(parameters('_artifactsLocation'), 'scripts/infra.sh', parameters('_artifactsLocationSasToken'))]",
                         "[concat(parameters('_artifactsLocation'), 'scripts/install.sh', parameters('_artifactsLocationSasToken'))]",
-                        "[concat(parameters('_artifactsLocation'), 'scripts/desktop.sh', parameters('_artifactsLocationSasToken'))]",
                         "[concat(parameters('_artifactsLocation'), 'scripts/azureProviderAndCreds.tf', parameters('_artifactsLocationSasToken'))]"
                     ]
                 },
